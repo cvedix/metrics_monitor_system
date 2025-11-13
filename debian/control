@@ -1,0 +1,21 @@
+Source: metrics-monitor-system
+Section: utils
+Priority: optional
+Maintainer: CVEDIX <support@cvedix.com>
+Build-Depends: debhelper (>= 13), cmake (>= 3.15), g++ (>= 7), git, build-essential
+Standards-Version: 4.5.1
+Homepage: https://github.com/cvedix/metrics_monitor_system
+
+Package: metrics-monitor-system
+Architecture: arm64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Metrics Monitor System - Hardware Information API Server
+ A REST API server that provides system hardware information using hwinfo library.
+ Provides endpoints for system information, status, and device registration.
+ .
+ Features:
+  - GET /v1/core/system/info - System hardware information
+  - GET /v1/core/system/status - System status and metrics
+  - POST /v1/core/system/info - Device registration (with Basic Auth)
+  - POST /v1/core/system/reboot - System reboot
+

@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "serial_number": "X99EINTE2314",
+  "model_type": "GTR_PRO",
+  "firmware_version": "1.0.0",
+  "hardware_id": "unknown",
+  "manufacturer": "CVEDIX",
+  "device_type": "AI_VISION_SYSTEM",
+  "hardware_revision": "REV_A",
+  "production_date": "2024-01-01",
+  "warranty_period": "24",
+  "support_contact": "support@cvedix.com",
+  "documentation_url": "https://docs.cvedix.com",
+  "mode": "local"
+}
+

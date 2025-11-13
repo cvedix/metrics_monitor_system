@@ -1,0 +1,13 @@
+Package: metrics-monitor-system-dbgsym
+Package-Type: ddeb
+Source: metrics-monitor-system
+Version: 1.0.0-1
+Auto-Built-Package: debug-symbols
+Architecture: arm64
+Maintainer: CVEDIX <support@cvedix.com>
+Installed-Size: 1141
+Depends: metrics-monitor-system (= 1.0.0-1)
+Section: debug
+Priority: optional
+Description: debug symbols for metrics-monitor-system
+Build-Ids: ae6d24aa5ad0486ab8b0a8fe8f014b64f4b97d94

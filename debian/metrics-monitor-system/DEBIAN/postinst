@@ -1,0 +1,37 @@
+#!/bin/sh
+set -e
+
+# Post-installation script for metrics-monitor-system
+
+# Create /opt/cvedix/monitor directory if it doesn't exist
+if [ ! -d /opt/cvedix/monitor ]; then
+    mkdir -p /opt/cvedix/monitor
+fi
+
+# Set proper permissions
+chmod 755 /opt/cvedix/monitor/metrics_monitor_system
+chmod 644 /opt/cvedix/monitor/*.json 2>/dev/null || true
+
+# Copy example config if config.json doesn't exist
+if [ ! -f /opt/cvedix/monitor/config.json ]; then
+    if [ -f /opt/cvedix/monitor/config.json.example ]; then
+        cp /opt/cvedix/monitor/config.json.example /opt/cvedix/monitor/config.json
+        chmod 644 /opt/cvedix/monitor/config.json
+        echo "Created /opt/cvedix/monitor/config.json from example"
+    fi
+fi
+
+# Ensure symlink exists
+if [ ! -L /usr/bin/metrics_monitor_system ]; then
+    ln -sf /opt/cvedix/monitor/metrics_monitor_system /usr/bin/metrics_monitor_system
+fi
+
+echo "metrics-monitor-system installed successfully!"
+echo "Installation directory: /opt/cvedix/monitor"
+echo "Configuration file: /opt/cvedix/monitor/config.json"
+echo "Start the service with: metrics_monitor_system"
+echo "Or directly: /opt/cvedix/monitor/metrics_monitor_system"
+
+# DEBHELPER#
+exit 0
+

@@ -1,0 +1,4 @@
+build/metrics_monitor_system opt/cvedix/monitor/
+config.json.example opt/cvedix/monitor/
+device_config.example.json opt/cvedix/monitor/
+

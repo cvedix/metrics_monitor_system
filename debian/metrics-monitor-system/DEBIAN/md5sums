@@ -1,0 +1,5 @@
+6059de24039ba10a44c1bbefc80c8ce9  opt/cvedix/monitor/config.json.example
+4cbee17cbeb686e8d5946c18799fa771  opt/cvedix/monitor/device_config.example.json
+bfd233b45b8f8c6a142a7c5593d791a8  opt/cvedix/monitor/metrics_monitor_system
+102f9766f487f7e93043f108c16b9135  usr/share/doc/metrics-monitor-system/README.md.gz
+888c7e9908afdc778b7aea153a54d289  usr/share/doc/metrics-monitor-system/changelog.Debian.gz

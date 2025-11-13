@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+# Post-removal script for metrics-monitor-system
+
+# Remove symlink
+if [ -L /usr/bin/metrics_monitor_system ]; then
+    rm -f /usr/bin/metrics_monitor_system
+fi
+
+# Clean up files if purging
+if [ "$1" = "purge" ]; then
+    # Optionally remove installation directory (commented out to preserve user data)
+    # rm -rf /opt/cvedix/monitor
+    echo "Installation files preserved in /opt/cvedix/monitor"
+    echo "To completely remove, run: rm -rf /opt/cvedix/monitor"
+fi
+
+# DEBHELPER#
+exit 0
+

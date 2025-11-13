@@ -58,6 +58,9 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 # Install
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+# Install example config files (for debian package, will be moved to /opt/cvedix/monitor by debian/rules)
+# Note: debian/install handles copying these files, so we don't need special handling here
 install(FILES 
     config.json.example
     device_config.example.json

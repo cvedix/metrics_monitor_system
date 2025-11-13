@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	# Setup dependencies first
+	./setup_dependencies.sh
+	# Configure with CMake for arm64 (package is arm64 only)
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE=Release
+
+override_dh_auto_build:
+	# Build with all available cores
+	dh_auto_build -- -j$(nproc)
+
+override_dh_auto_install:
+	# Install binary to temp directory first
+	dh_auto_install --destdir=$(CURDIR)/debian/tmp
+	# Create /opt/cvedix/monitor directory structure
+	install -d $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor
+	# Copy binary from temp directory
+	install -m 755 $(CURDIR)/debian/tmp/usr/bin/metrics_monitor_system $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor/
+	# Copy config examples directly from source
+	install -m 644 config.json.example $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor/
+	install -m 644 device_config.example.json $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor/
+	# Create symlink in /usr/bin for easy access
+	install -d $(CURDIR)/debian/metrics-monitor-system/usr/bin
+	ln -sf /opt/cvedix/monitor/metrics_monitor_system $(CURDIR)/debian/metrics-monitor-system/usr/bin/metrics_monitor_system
+	# Install documentation
+	install -d $(CURDIR)/debian/metrics-monitor-system/usr/share/doc/metrics-monitor-system
+	install -m 644 README.md $(CURDIR)/debian/metrics-monitor-system/usr/share/doc/metrics-monitor-system/ 2>/dev/null || true
+
