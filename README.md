@@ -2,6 +2,8 @@
 
 Hệ thống giám sát phần cứng và trạng thái hệ thống sử dụng thư viện [hwinfo](https://github.com/lfreist/hwinfo) - một thư viện C++ cross-platform để lấy thông tin phần cứng.
 
+> 📖 **Xem thêm**: [Kiến trúc Hệ thống](./ARCHITECTURE.md) - Sơ đồ chi tiết về kiến trúc, luồng dữ liệu và cấu trúc của hệ thống.
+
 ## Tính năng
 
 - **GET /v1/core/system/info**: Lấy thông tin chi tiết về phần cứng hệ thống (Device info, Status, Instances, CPU, RAM, GPU, Disk, Mainboard, OS)
