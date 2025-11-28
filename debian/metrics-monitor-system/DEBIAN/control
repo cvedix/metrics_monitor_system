@@ -2,8 +2,8 @@ Package: metrics-monitor-system
 Version: 1.0.0-1
 Architecture: arm64
 Maintainer: CVEDIX <support@cvedix.com>
-Installed-Size: 1222
-Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.0), libstdc++6 (>= 12)
+Installed-Size: 2153
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.3.1), libstdc++6 (>= 12)
 Section: utils
 Priority: optional
 Homepage: https://github.com/cvedix/metrics_monitor_system

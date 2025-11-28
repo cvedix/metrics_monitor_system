@@ -1,0 +1,22 @@
+[Unit]
+Description=Metrics Monitor System - Hardware Information API Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/cvedix/monitor
+ExecStart=/opt/cvedix/monitor/metrics_monitor_system /opt/cvedix/monitor/config.json
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=metrics-monitor-system
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,6 +1,6 @@
 {
   "server": {
-    "port": 8080,
+    "port": 6879,
     "host": "0.0.0.0",
     "description": "0.0.0.0 for public access, 127.0.0.1 for local only"
   },

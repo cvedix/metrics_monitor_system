@@ -21,6 +21,7 @@ override_dh_auto_install:
 	# Copy binary from temp directory
 	install -m 755 $(CURDIR)/debian/tmp/usr/bin/metrics_monitor_system $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor/
 	# Copy config examples directly from source
+	# Note: hwinfo libraries will be installed by dh_install using debian/metrics-monitor-system.install
 	install -m 644 config.json.example $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor/
 	install -m 644 device_config.example.json $(CURDIR)/debian/metrics-monitor-system/opt/cvedix/monitor/
 	# Create symlink in /usr/bin for easy access
@@ -29,4 +30,10 @@ override_dh_auto_install:
 	# Install documentation
 	install -d $(CURDIR)/debian/metrics-monitor-system/usr/share/doc/metrics-monitor-system
 	install -m 644 README.md $(CURDIR)/debian/metrics-monitor-system/usr/share/doc/metrics-monitor-system/ 2>/dev/null || true
+	# Install systemd service file
+	install -d $(CURDIR)/debian/metrics-monitor-system/lib/systemd/system
+	install -m 644 $(CURDIR)/debian/metrics-monitor-system.service $(CURDIR)/debian/metrics-monitor-system/lib/systemd/system/
 
+override_dh_missing:
+	# Libraries are installed manually in override_dh_auto_install, so skip checking them
+	dh_missing --fail-missing

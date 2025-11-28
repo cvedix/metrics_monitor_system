@@ -1,5 +1,14 @@
+fbb79783788b4455a171b0e56713c6ad  lib/systemd/system/metrics-monitor-system.service
 6059de24039ba10a44c1bbefc80c8ce9  opt/cvedix/monitor/config.json.example
 4cbee17cbeb686e8d5946c18799fa771  opt/cvedix/monitor/device_config.example.json
-bfd233b45b8f8c6a142a7c5593d791a8  opt/cvedix/monitor/metrics_monitor_system
-102f9766f487f7e93043f108c16b9135  usr/share/doc/metrics-monitor-system/README.md.gz
+2c2f0b534355befb520a7654190fad9d  opt/cvedix/monitor/metrics_monitor_system
+ca9a4034ecf5f14e9380b60e51f8f94c  usr/lib/aarch64-linux-gnu/libhwinfo_battery.so
+f6062dfaf68b64fbeed0f093a4ea4d5f  usr/lib/aarch64-linux-gnu/libhwinfo_cpu.so
+2473b556301345275b1109f6085bf732  usr/lib/aarch64-linux-gnu/libhwinfo_disk.so
+306fd2022f4ac9945fd080478202807b  usr/lib/aarch64-linux-gnu/libhwinfo_gpu.so
+27fa8673681375320741485a2d220cec  usr/lib/aarch64-linux-gnu/libhwinfo_mainboard.so
+1209a78a5089b9ca8ef670c1c0d36e9f  usr/lib/aarch64-linux-gnu/libhwinfo_network.so
+20fa84e2ca00e83d447f0a3a4051a378  usr/lib/aarch64-linux-gnu/libhwinfo_os.so
+aea0058a8686ebdf69595d3485c7ca95  usr/lib/aarch64-linux-gnu/libhwinfo_ram.so
+d8f7b441663ee7b48d62ccc3807ab7af  usr/share/doc/metrics-monitor-system/README.md.gz
 888c7e9908afdc778b7aea153a54d289  usr/share/doc/metrics-monitor-system/changelog.Debian.gz

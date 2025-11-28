@@ -1,3 +1,8 @@
-./build/metrics_monitor_system
-./config.json.example
-./device_config.example.json
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_battery.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_cpu.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_disk.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_gpu.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_mainboard.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_network.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_os.so
+debian/tmp/usr/lib/aarch64-linux-gnu/libhwinfo_ram.so

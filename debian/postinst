@@ -26,11 +26,24 @@ if [ ! -L /usr/bin/metrics_monitor_system ]; then
     ln -sf /opt/cvedix/monitor/metrics_monitor_system /usr/bin/metrics_monitor_system
 fi
 
+# Reload systemd and enable service
+if [ -f /lib/systemd/system/metrics-monitor-system.service ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || true
+    # Don't auto-start on install, let user start manually
+    # systemctl enable metrics-monitor-system >/dev/null 2>&1 || true
+    # systemctl start metrics-monitor-system >/dev/null 2>&1 || true
+fi
+
 echo "metrics-monitor-system installed successfully!"
 echo "Installation directory: /opt/cvedix/monitor"
 echo "Configuration file: /opt/cvedix/monitor/config.json"
-echo "Start the service with: metrics_monitor_system"
-echo "Or directly: /opt/cvedix/monitor/metrics_monitor_system"
+echo ""
+echo "To start the service:"
+echo "  sudo systemctl start metrics-monitor-system"
+echo "To enable auto-start on boot:"
+echo "  sudo systemctl enable metrics-monitor-system"
+echo "To check status:"
+echo "  sudo systemctl status metrics-monitor-system"
 
 # DEBHELPER#
 exit 0

@@ -1,6 +1,5 @@
 usr/bin/metrics_monitor_system
 usr/include/hwinfo/
-usr/lib/libhwinfo_*.so
-usr/lib/cmake/hwinfo/
+usr/lib/*/cmake/hwinfo/
 usr/share/metrics_monitor_system/
 

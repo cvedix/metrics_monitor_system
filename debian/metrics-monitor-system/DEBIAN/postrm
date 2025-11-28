@@ -3,6 +3,13 @@ set -e
 
 # Post-removal script for metrics-monitor-system
 
+# Reload systemd if service file was removed
+if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
+    if [ ! -f /lib/systemd/system/metrics-monitor-system.service ]; then
+        systemctl daemon-reload >/dev/null 2>&1 || true
+    fi
+fi
+
 # Remove symlink
 if [ -L /usr/bin/metrics_monitor_system ]; then
     rm -f /usr/bin/metrics_monitor_system

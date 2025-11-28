@@ -3,9 +3,11 @@ set -e
 
 # Pre-removal script for metrics-monitor-system
 
-# Stop service if running (if systemd service exists)
-if systemctl is-active --quiet metrics-monitor-system 2>/dev/null; then
-    systemctl stop metrics-monitor-system || true
+# Stop and disable service if running
+if [ -f /lib/systemd/system/metrics-monitor-system.service ]; then
+    systemctl stop metrics-monitor-system >/dev/null 2>&1 || true
+    systemctl disable metrics-monitor-system >/dev/null 2>&1 || true
+    systemctl daemon-reload >/dev/null 2>&1 || true
 fi
 
 # DEBHELPER#
