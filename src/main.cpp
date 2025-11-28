@@ -255,6 +255,9 @@ void handle_post_system_info(const Request& req, Response& res) {
         // Get JSON body
         std::string json_body = req.body;
         
+        std::cout << "DEBUG POST: Received JSON body length: " << json_body.length() << std::endl;
+        std::cout << "DEBUG POST: JSON body (first 500 chars): " << json_body.substr(0, 500) << std::endl;
+        
         if (json_body.empty()) {
             res.status = 400;
             res.set_content(R"({"error": "Bad Request", "message": "JSON body is required"})", "application/json");

@@ -43,17 +43,25 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 
 # Copy JSON config files to build directory
+# Only copy config.json if it exists (it's optional, config.json.example is the template)
+if(EXISTS "${CMAKE_SOURCE_DIR}/config.json")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/config.json"
+            "${CMAKE_BINARY_DIR}/config.json"
+        COMMENT "Copying config.json to build directory"
+    )
+endif()
+
+# Always copy example files
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/config.json"
-        "${CMAKE_BINARY_DIR}/config.json"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/config.json.example"
         "${CMAKE_BINARY_DIR}/config.json.example"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/device_config.example.json"
         "${CMAKE_BINARY_DIR}/device_config.example.json"
-    COMMENT "Copying JSON config files to build directory"
+    COMMENT "Copying JSON example config files to build directory"
 )
 
 # Install

@@ -1,10 +1,13 @@
 #include "device_config.h"
+#include "json_utils.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <sys/stat.h>
+#include <ctime>
 
 // Build date macros (set by compiler)
 #ifndef BUILD_DATE
@@ -15,6 +18,7 @@ static DeviceInfo g_device_info;
 static bool g_config_loaded = false;
 static std::vector<std::string> g_device_instances;
 static std::string g_cached_system_uuid; // Cache system UUID (doesn't change)
+static time_t g_last_instances_file_mtime = 0; // Track file modification time for instances
 
 // Default device configuration
 static DeviceInfo get_default_device_info() {
@@ -153,16 +157,28 @@ static std::vector<std::string> extract_json_array(const std::string& json, cons
     std::vector<std::string> result;
     std::string search_key = "\"" + key + "\"";
     size_t pos = json.find(search_key);
-    if (pos == std::string::npos) return result;
+    if (pos == std::string::npos) {
+        std::cout << "DEBUG extract_json_array: Key \"" << key << "\" not found in JSON" << std::endl;
+        return result;
+    }
+    
+    std::cout << "DEBUG extract_json_array: Found key \"" << key << "\" at position " << pos << std::endl;
     
     pos = json.find("[", pos);
-    if (pos == std::string::npos) return result;
+    if (pos == std::string::npos) {
+        std::cout << "DEBUG extract_json_array: '[' not found after key" << std::endl;
+        return result;
+    }
     
     pos++; // Skip [
     size_t end = json.find("]", pos);
-    if (end == std::string::npos) return result;
+    if (end == std::string::npos) {
+        std::cout << "DEBUG extract_json_array: ']' not found" << std::endl;
+        return result;
+    }
     
     std::string array_content = json.substr(pos, end - pos);
+    std::cout << "DEBUG extract_json_array: Array content = \"" << array_content << "\"" << std::endl;
     
     // Parse array elements
     size_t elem_start = 0;
@@ -189,7 +205,9 @@ static std::vector<std::string> extract_json_array(const std::string& json, cons
                 }
             }
             if (elem_end < array_content.length()) {
-                result.push_back(array_content.substr(elem_start, elem_end - elem_start));
+                std::string elem = array_content.substr(elem_start, elem_end - elem_start);
+                result.push_back(elem);
+                std::cout << "DEBUG extract_json_array: Extracted element = \"" << elem << "\"" << std::endl;
                 elem_start = elem_end + 1;
             } else {
                 break;
@@ -199,6 +217,7 @@ static std::vector<std::string> extract_json_array(const std::string& json, cons
         }
     }
     
+    std::cout << "DEBUG extract_json_array: Total extracted " << result.size() << " elements" << std::endl;
     return result;
 }
 
@@ -318,6 +337,7 @@ void load_device_config() {
 void reload_device_config() {
     g_config_loaded = false;
     g_device_instances.clear();
+    g_last_instances_file_mtime = 0; // Reset modification time tracking
     
     // Load config (this will also load instances from file)
     load_device_config();
@@ -338,6 +358,12 @@ void reload_device_config() {
         std::vector<std::string> instances = extract_json_array(content, "instances");
         if (!instances.empty()) {
             g_device_instances = instances;
+        }
+        
+        // Update modification time tracking
+        struct stat file_stat;
+        if (stat(config_path.c_str(), &file_stat) == 0) {
+            g_last_instances_file_mtime = file_stat.st_mtime;
         }
     }
 }
@@ -377,6 +403,26 @@ DeviceStatus get_device_status() {
 }
 
 std::vector<std::string> get_device_instances() {
+    // Check if file has been modified since last load
+    std::string config_path = "./device_registered.json";
+    struct stat file_stat;
+    bool file_exists = (stat(config_path.c_str(), &file_stat) == 0);
+    
+    if (!file_exists) {
+        config_path = "/etc/device_registered.json";
+        file_exists = (stat(config_path.c_str(), &file_stat) == 0);
+    }
+    
+    // If file exists and has been modified, clear cache and reload
+    if (file_exists) {
+        time_t current_mtime = file_stat.st_mtime;
+        if (current_mtime != g_last_instances_file_mtime) {
+            // File has been modified, clear cache
+            g_device_instances.clear();
+            g_last_instances_file_mtime = current_mtime;
+        }
+    }
+    
     // If instances are already cached, return them (fast path)
     if (!g_device_instances.empty()) {
         return g_device_instances;
@@ -385,7 +431,7 @@ std::vector<std::string> get_device_instances() {
     // Try to read from saved config file
     // Try current directory first, then /etc
     std::vector<std::string> instances;
-    std::string config_path = "./device_registered.json";
+    config_path = "./device_registered.json";
     std::ifstream saved_config(config_path);
     
     if (!saved_config.is_open()) {
@@ -398,6 +444,11 @@ std::vector<std::string> get_device_instances() {
                            std::istreambuf_iterator<char>());
         saved_config.close();
         instances = extract_json_array(content, "instances");
+        
+        // Update modification time tracking
+        if (stat(config_path.c_str(), &file_stat) == 0) {
+            g_last_instances_file_mtime = file_stat.st_mtime;
+        }
     }
     
     // If loaded from file, cache and return
@@ -499,8 +550,15 @@ bool update_device_config_from_json(const std::string& json_str) {
     
     // Extract instances (at root level)
     std::vector<std::string> instances = extract_json_array(json_str, "instances");
+    std::cout << "DEBUG: Extracted " << instances.size() << " instances from JSON" << std::endl;
+    for (size_t i = 0; i < instances.size(); ++i) {
+        std::cout << "DEBUG: Instance[" << i << "] = " << instances[i] << std::endl;
+    }
     if (!instances.empty()) {
         set_device_instances(instances);
+        std::cout << "DEBUG: Set device instances successfully" << std::endl;
+    } else {
+        std::cout << "DEBUG: WARNING - No instances found in JSON or extraction failed" << std::endl;
     }
     
     return true;
@@ -522,29 +580,60 @@ bool save_device_config() {
     }
     
     config_file << "{\n";
-    config_file << "  \"version\": \"" << g_device_info.version << "\",\n";
-    config_file << "  \"serial_number\": \"" << g_device_info.serial_number << "\",\n";
-    config_file << "  \"model_type\": \"" << g_device_info.model_type << "\",\n";
-    config_file << "  \"device_type\": \"" << g_device_info.device_type << "\",\n";
-    config_file << "  \"hardware_revision\": \"" << g_device_info.hardware_revision << "\",\n";
-    config_file << "  \"production_date\": \"" << g_device_info.production_date << "\",\n";
-    config_file << "  \"warranty_period\": \"" << g_device_info.warranty_period << "\",\n";
-    config_file << "  \"build_date\": \"" << g_device_info.build_date << "\",\n";
-    config_file << "  \"mode\": \"" << g_device_info.mode << "\",\n";
-    config_file << "  \"endpoint_port\": \"" << g_device_info.endpoint_port << "\",\n";
+    config_file << "  \"version\": \"" << escape_json(g_device_info.version) << "\",\n";
+    config_file << "  \"serial_number\": \"" << escape_json(g_device_info.serial_number) << "\",\n";
+    config_file << "  \"model_type\": \"" << escape_json(g_device_info.model_type) << "\",\n";
+    config_file << "  \"device_type\": \"" << escape_json(g_device_info.device_type) << "\",\n";
+    config_file << "  \"hardware_revision\": \"" << escape_json(g_device_info.hardware_revision) << "\",\n";
+    config_file << "  \"production_date\": \"" << escape_json(g_device_info.production_date) << "\",\n";
+    config_file << "  \"warranty_period\": \"" << escape_json(g_device_info.warranty_period) << "\",\n";
+    config_file << "  \"build_date\": \"" << escape_json(g_device_info.build_date) << "\",\n";
+    config_file << "  \"mode\": \"" << escape_json(g_device_info.mode) << "\",\n";
+    config_file << "  \"endpoint_port\": \"" << escape_json(g_device_info.endpoint_port) << "\",\n";
     
-    // Save instances
-    std::vector<std::string> instances = g_device_instances.empty() ? get_device_instances() : g_device_instances;
+    // Save instances - ALWAYS use g_device_instances if set, don't read from file
+    // because we're saving the NEW values, not the old ones from file
+    std::vector<std::string> instances = g_device_instances;
+    std::cout << "DEBUG: Saving " << instances.size() << " instances to file (g_device_instances.size() = " << g_device_instances.size() << ")" << std::endl;
+    for (size_t i = 0; i < instances.size(); ++i) {
+        std::cout << "DEBUG: Saving instance[" << i << "] = " << instances[i] << std::endl;
+    }
+    
+    // If instances is empty, it means no instances were set in the POST request
+    // In this case, we should keep the existing instances from file
+    if (instances.empty()) {
+        std::cout << "DEBUG: No instances in memory, reading from file to preserve existing values" << std::endl;
+        instances = get_device_instances();
+    }
     config_file << "  \"instances\": [\n";
     for (size_t i = 0; i < instances.size(); ++i) {
-        config_file << "    \"" << instances[i] << "\"";
+        config_file << "    \"" << escape_json(instances[i]) << "\"";
         if (i < instances.size() - 1) config_file << ",";
         config_file << "\n";
     }
     config_file << "  ]\n";
     
     config_file << "}\n";
+    config_file.flush(); // Ensure data is written immediately
+    
+    // Verify file was written successfully BEFORE closing
+    if (!config_file.good()) {
+        std::cerr << "Error: Failed to write device_registered.json to " << config_path << std::endl;
+        config_file.close();
+        return false;
+    }
+    
     config_file.close();
+    
+    // Update modification time tracking after successful save
+    struct stat file_stat;
+    if (stat(config_path.c_str(), &file_stat) == 0) {
+        g_last_instances_file_mtime = file_stat.st_mtime;
+        std::cout << "Successfully saved device configuration to " << config_path << std::endl;
+        std::cout << "File modification time: " << file_stat.st_mtime << std::endl;
+    } else {
+        std::cerr << "Warning: Could not stat saved file " << config_path << std::endl;
+    }
     
     return true;
 }
